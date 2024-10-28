@@ -17,13 +17,21 @@ class EntityUnionType extends UnionType
      */
     public function __construct($entityTypes)
     {
-        $config = [
-            'name' => self::getTypeName(),
-            'types' => is_callable($entityTypes) 
-                ? fn () => array_values($entityTypes())
-                : array_values($entityTypes)
-                
-        ];
+        $config = [];
+        $entityTypesCount = count(
+            is_callable($entityTypes)
+                ? $entityTypes()
+                : $entityTypes
+        );
+        if ($entityTypesCount > 0) {
+            $config = [
+                'name' => self::getTypeName(),
+                'types' => is_callable($entityTypes)
+                    ? fn() => array_values($entityTypes())
+                    : array_values($entityTypes)
+
+            ];
+        }
         parent::__construct($config);
     }
 
