@@ -187,23 +187,27 @@ class FederatedSchema extends Schema
     /** @var array */
     private function getQueryTypeEntitiesFieldConfig(?array $config): array
     {
-        return [
-            '_entities' => [
-                'type' => Type::listOf($this->entityUnionType),
-                'args' => [
-                    'representations' => [
-                        'type' => Type::nonNull(Type::listOf(Type::nonNull($this->anyType)))
-                    ]
-                ],
-                'resolve' => function ($root, $args, $context, $info) use ($config) {
-                    if (isset($config) && isset($config['resolve']) && is_callable($config['resolve'])) {
-                        return $config['resolve']($root, $args, $context, $info);
-                    } else {
-                        return $this->resolve($root, $args, $context, $info);
+        if ($this->hasEntityTypes()) {
+            return [
+                '_entities' => [
+                    'type' => Type::listOf($this->entityUnionType),
+                    'args' => [
+                        'representations' => [
+                            'type' => Type::nonNull(Type::listOf(Type::nonNull($this->anyType)))
+                        ]
+                    ],
+                    'resolve' => function ($root, $args, $context, $info) use ($config) {
+                        if (isset($config) && isset($config['resolve']) && is_callable($config['resolve'])) {
+                            return $config['resolve']($root, $args, $context, $info);
+                        } else {
+                            return $this->resolve($root, $args, $context, $info);
+                        }
                     }
-                }
-            ]
-        ];
+                ]
+            ];
+        }
+
+        return [];
     }
 
     private function resolve($root, $args, $context, $info)
