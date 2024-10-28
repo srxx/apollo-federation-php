@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Apollo\Federation\Tests;
 
+use Apollo\Federation\Directives;
+use Apollo\Federation\FederatedSchema;
+use Apollo\Federation\Utils\FederatedSchemaPrinter;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Spatie\Snapshots\MatchesSnapshots;
 
@@ -66,6 +72,23 @@ class SchemaTest extends TestCase
         $this->assertArrayHasKey('include', $directives);
         $this->assertArrayHasKey('skip', $directives);
         $this->assertArrayHasKey('deprecated', $directives);
+    }
+
+    public function testNoEntitiesResolvedForFederatedSchema()
+    {
+        $schema = new FederatedSchema([
+            'query' => new ObjectType([
+                'name' => 'Query',
+                'fields' => [
+                    '_' => ['type' => Type::string()]
+                ]
+            ])
+        ]);
+        $query = 'query GetServiceSdl { _service { sdl } }';
+
+        $result = GraphQL::executeQuery($schema, $query);
+
+        $this->assertMatchesSnapshot($result->toArray());
     }
 
     public function testServiceSdl()
@@ -155,4 +178,3 @@ class SchemaTest extends TestCase
         $this->assertMatchesSnapshot($result->toArray());
     }
 }
- 

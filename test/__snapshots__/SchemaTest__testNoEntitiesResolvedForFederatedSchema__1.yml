@@ -1,0 +1,2 @@
+data:
+    _service: { sdl: "extend type Query {\n  _: String \n  _service: _Service! \n}\n\ntype _Service {\n  sdl: String \n}\n" }
